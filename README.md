@@ -1,2 +1,2 @@
 # ProjetoAgendaTelefonica
-Projeto criado para praticar o estudo de programação de Java em POO, e operações básicas matemáticas.
+Projeto criado para praticar o estudo de programação de Java em POO, operações básicas matemáticas e experiência com cadastro simples.

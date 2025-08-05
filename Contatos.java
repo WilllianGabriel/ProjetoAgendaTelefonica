@@ -9,7 +9,7 @@ public class Contatos {
 	private String telefone;
 	
 	public void mostrar() {
-		System.out.println("Você ainda não tem nenhum Contato!");
+		System.out.println("Você ainda não tem nenhum Contato!\n");
 	}
 	
 	//setter e //getter
@@ -26,7 +26,13 @@ public class Contatos {
 	}
 	
 	public String getTelefone() {
+		if (telefone.length() == 11) {
+			telefone = String.format("(%s) %s %s-%s",
+					telefone.substring(0,2),
+					telefone.substring(2,3),
+					telefone.substring(3,7),
+					telefone.substring(7,11));
+		}		
 		return telefone;
 	}
-	
 }

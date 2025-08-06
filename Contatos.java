@@ -2,14 +2,14 @@ package agendatelefonica;
 
 public class Contatos {
 	
-	//void não pode ser reultilizado.
-	//return é só usado quando o valor precisa ser reutilizado.
+	//void não pode ser reultilizado
+	//return é só usado quando o valor precisa ser reutilizado
 	
 	private String name;
 	private String telefone;
 	
-	public void mostrar() {
-		System.out.println("Você ainda não tem nenhum Contato!\n");
+	public void showContacts() {
+		System.out.println("Ainda em desenvolvimento!\n");
 	}
 	
 	//setter e //getter

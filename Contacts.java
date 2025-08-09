@@ -4,12 +4,14 @@ public class Contacts {
 	private String name;
 	private String telefone;
 	
+	//metodo Construtor para registrar o nome e telefone do contato
 	public Contacts (String name, String telefone) {
 		this.name = name;
 		this.telefone = telefone;
 	}
-	public void showContacts() {
-		System.out.println("Nome: "+name);
+	//Mostrar o nome e telefone
+	public void showContact() {
+		System.out.println("\nNome: "+name);
 		if (telefone.length() == 11) {
 			telefone = String.format("(%s) %s %s-%s",
 					telefone.substring(0,2),
@@ -19,11 +21,11 @@ public class Contacts {
 		}
 		System.out.println("Telefone: "+telefone);
 	}
-	
+	//retorna o valor do nome
 	public String getName() {
 		return name;
 	}
-	
+	//retorna o valor do telefone
 	public String getTelefone() {
 		if (telefone.length() >= 11) {
 			telefone = String.format("(%s) %s %s-%s",

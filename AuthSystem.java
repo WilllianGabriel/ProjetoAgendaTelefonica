@@ -17,12 +17,14 @@ public class AuthSystem {
 	//verifica o estatus do login
 	public LoginStatus login(String email, String password) {
 		if (registeredUser == null) {
-			System.out.println("Nenhum Usuário foi Cadastrado, Aperte Enter para tentar de novo!");
+			System.out.println("Nenhum Usuário foi Cadastrado");
 			return LoginStatus.USUR_NOT_REGISTED;
 		}if (registeredUser.getEmail().equals(email) && 
 				registeredUser.getPassword().equals(password)){
+			System.out.println("Login feito com sucesso");
 			return LoginStatus.SUCESS;
 		}else {
+			System.out.println("Digito Invalido");
 			return LoginStatus.INVALID_PASSWORD;
 		}
 	}

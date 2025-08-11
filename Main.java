@@ -17,8 +17,8 @@ public class Main {
 		int optionMenu = 1;
 
 		while (optionAuth != 0) {
-			
-			//MENU DE CADASTRO
+
+			// MENU DE CADASTRO
 			System.out.println("\n === Menu ===");
 			System.out.println("1 - Cadastrar");
 			System.out.println("2 - Login");
@@ -39,6 +39,8 @@ public class Main {
 				System.out.println("Digite seu senha:");
 				String password = sc.nextLine();
 				auth.register(email, password);
+				System.out.println("Aperte Enter para continuar!");
+				sc.nextLine();
 				u.clear();
 				break;
 			}
@@ -53,23 +55,24 @@ public class Main {
 					System.out.println("Digite seu senha:");
 					String passwordLogin = sc.nextLine();
 					LoginStatus status = auth.login(emailLogin, passwordLogin);
-					
+
 					switch (status) {
 					case LoginStatus.SUCESS: {
-						System.out.println("\nlogin feito com sucesso, Aperte Enter para continuar!");
+						System.out.println("\nAperte Enter para continuar!");
 						sc.nextLine();
 						u.clear();
 						loopLogin = 0;
 						optionAuth = 0;
 						break;
 					}
-					case LoginStatus.INVALID_PASSWORD:{
-						System.out.println("\nDigito Invalido!, Aperte Enter para tentar de novo!");
+					case LoginStatus.INVALID_PASSWORD: {
+						System.out.println("\nAperte Enter para tentar de novo!");
 						sc.nextLine();
 						u.clear();
 						break;
 					}
 					default:
+						System.out.println("\nAperte Enter para Voltar ao menu!");
 						loopLogin = 0;
 						sc.nextLine();
 						u.clear();
@@ -92,13 +95,14 @@ public class Main {
 			}
 		}
 		while (optionMenu != 0) {
-			
-			//MENU PRINCIPAL
+
+			// MENU PRINCIPAL
 			System.out.println("\n=== Bem vindo, A Agenda de Contatos! ===\n");
 			System.out.println("1 - Adicionar um Contato");
 			System.out.println("2 - Lista de Contatos");
-			System.out.println("3 - Deleter um Contato");
-			System.out.println("4 - Editar um Contato");
+			System.out.println("3 - Buscar contato");
+			System.out.println("4 - Editar contato");
+			System.out.println("5 - Remover contato");
 			System.out.println("0 - Sair");
 			System.out.println("Escolha uma Opção: ");
 			String n2 = sc.nextLine();
@@ -109,7 +113,7 @@ public class Main {
 			case "1": {
 				System.out.println("Digite o nome do Contato:");
 				String name = sc.nextLine();
-				
+
 				int t = 0;
 				while (t != 1) {
 					System.out.println("Digite o número do Contato:");
@@ -134,16 +138,33 @@ public class Main {
 				u.clear();
 				break;
 			}
-			case "3":{
-				System.out.println("Ainda em desenvolvimento 3");
+			case "3": {
+				System.out.println("Digite o nome do contato que deseja buscar: ");
+				String searchName = sc.nextLine();
+				manager.searchContact(searchName);
 				System.out.println("\nAperte Enter para voltar ao menu");
 				sc.nextLine();
 				u.clear();
 				break;
 			}
-			case "4":{
-				System.out.println("Ainda em desenvolvimento 4");
-				System.out.println("\nAperte Enter para tentar de novo!");
+			case "4": {
+				System.out.println("Digite o nome do contato que deseja editar: ");
+				String oldName = sc.nextLine();
+				System.out.println("Digite o novo nome para esse Contato: ");
+				String newName = sc.nextLine();
+				System.out.println("Digite o novo telefone para esse Contato: ");
+				String newTelefone = sc.nextLine();
+				manager.editContact(oldName, newName, newTelefone);
+				System.out.println("\nAperte Enter para voltar ao menu");
+				sc.nextLine();
+				u.clear();
+				break;
+			}
+			case "5": {
+				System.out.println("Digite o nome do contato que deseja remover: ");
+				String removeName = sc.nextLine();
+				manager.removeContact(removeName);
+				System.out.println("\nAperte Enter para voltar ao menu");
 				sc.nextLine();
 				u.clear();
 				break;
@@ -159,7 +180,6 @@ public class Main {
 				break;
 			}
 		}
-
 		System.out.println("\nFim do Programa!");
 		sc.close();
 	}

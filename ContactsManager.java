@@ -8,11 +8,13 @@ public class ContactsManager {
 	private ArrayList<Contacts> contactList = new ArrayList<>();
 	private final String FILE_NAME = "data/Contacts.txt";
 
+	// Método construtor para carregar todos os contatos no arquivo, toda vez que,
+	// essa classe for chamada, simulando um banco de dados
 	public ContactsManager() {
 		loadContacts();
 	}
 
-	// Método para adicionar novo contato na lista
+	// Método para adicionar novo contato na lista de contatos
 	public void addContact(String name, String telefone) {
 		Contacts contact = new Contacts(name, telefone);
 		contactList.add(contact);
@@ -80,7 +82,8 @@ public class ContactsManager {
 		}
 	}
 
-	// Método para subreescrever o arquivo, tanto para remover quanto editar os contatos
+	// Método para subreescrever o arquivo, tanto para remover quanto editar os
+	// contatos
 	private void updateFile() {
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME))) {
 			for (Contacts c : contactList) {
@@ -108,6 +111,7 @@ public class ContactsManager {
 			System.out.println("Contato não encontrado.");
 		}
 	}
+
 	// Método para procurar um contato pelo nome e editar seus dados
 	public void editContact(String oldName, String newName, String newTelefone) {
 		boolean updating = false;
@@ -125,5 +129,15 @@ public class ContactsManager {
 		} else {
 			System.out.println("Contato não encontrado para edição");
 		}
+	}
+	
+	// Método para verificar se o contato ja existe
+	public boolean contactExists(String name) {
+		for (Contacts c : contactList) {
+			if (c.getName().equalsIgnoreCase(name)) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

@@ -9,7 +9,7 @@ public class Contacts {
 		this.name = name;
 		this.telefone = telefone;
 	}
-	// Mostrar o nome e telefone
+	// Método para mostrar o nome e telefone
 	public void showContact() {
 		System.out.println("\nNome: "+name);
 		if (telefone.length() == 11) {
@@ -21,20 +21,20 @@ public class Contacts {
 		}
 		System.out.println("Telefone: "+telefone);
 	}
-	// retorna o valor do nome
+	// Método para retorna o valor do nome
 	public String getName() {
 		return name;
 	}
 
-	// retorna o valor do telefone
+	// Método para retorna o valor do telefone
 	public String getTelefone() {
 		return telefone;
 	}
-
+	// Método para receber o valor do nome
 	public void setName(String name) {
 		this.name = name;
 	}
-
+	// Método para receber o valor do telefone
 	public void setTelefone(String telefone) {
 		this.telefone = telefone;
 	}

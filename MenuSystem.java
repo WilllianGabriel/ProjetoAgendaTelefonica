@@ -124,7 +124,7 @@ public class MenuSystem {
 				break;
 			}
 			case "2": {
-				showContact();
+				showContacts();
 				break;
 			}
 			case "3": {
@@ -158,7 +158,7 @@ public class MenuSystem {
 
 		System.out.println("Digite o nome do Contato:");
 		String name = sc.nextLine();
-		if (manager.contactExists(name)) {
+		if (name == null) {
 			System.out.println("Já existe um contato com esse nome.");
 			System.out.println("\nAperte Enter para Voltar ao menu!");
 			sc.nextLine();
@@ -185,7 +185,7 @@ public class MenuSystem {
 
 	// Chama o método responsável por mostrar os contatos ja
 	// adicionados
-	private void showContact() {
+	private void showContacts() {
 		manager.showContacts();
 		System.out.println("\nAperte Enter para Voltar ao menu!");
 		sc.nextLine();
@@ -196,7 +196,7 @@ public class MenuSystem {
 	private void searchContact() {
 		System.out.println("Digite o nome do contato que deseja buscar: ");
 		String searchName = sc.nextLine();
-		manager.searchContact(searchName);
+		//manager.searchContact(searchName);
 		System.out.println("\nAperte Enter para voltar ao menu");
 		sc.nextLine();
 		u.clear();
@@ -210,7 +210,7 @@ public class MenuSystem {
 		String newName = sc.nextLine();
 		System.out.println("Digite o novo telefone para esse Contato: ");
 		String newTelefone = sc.nextLine();
-		manager.editContact(oldName, newName, newTelefone);
+		///manager.editContact(oldName, newName, newTelefone);
 		System.out.println("\nAperte Enter para voltar ao menu");
 		sc.nextLine();
 		u.clear();
@@ -220,7 +220,7 @@ public class MenuSystem {
 	private void removeContact() {
 		System.out.println("Digite o nome do contato que deseja remover: ");
 		String removeName = sc.nextLine();
-		manager.removeContact(removeName);
+		//manager.removeContact(removeName);
 		System.out.println("\nAperte Enter para voltar ao menu");
 		sc.nextLine();
 		u.clear();

@@ -16,4 +16,14 @@ public class Utils {
 		}
 		return text.matches("\\d+");
 	}
+	public void phoneFormat(String telefone) {
+		if (telefone.length() == 11) {
+			telefone = String.format("(%s) %s %s-%s",
+					telefone.substring(0, 2),
+					telefone.substring(2, 3),
+					telefone.substring(3, 7),
+					telefone.substring(7, 11));
+		}
+		System.out.println("Telefone: " + telefone);
+	}
 }

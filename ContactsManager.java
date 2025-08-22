@@ -1,143 +1,215 @@
 package agendatelefonica;
 
-import java.io.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 
 public class ContactsManager {
 
-	private ArrayList<Contacts> contactList = new ArrayList<>();
-	private final String FILE_NAME = "data/Contacts.txt";
+	private DatabaseConnection db = new DatabaseConnection();
+	private List<Contacts> listContacts = new ArrayList<Contacts>();
 
-	// Método construtor para carregar todos os contatos no arquivo, toda vez que,
-	// essa classe for chamada, simulando um banco de dados
 	public ContactsManager() {
-		loadContacts();
+		loadContact();
 	}
 
-	// Método para adicionar novo contato na lista de contatos
+	private List<Contacts> loadContact() {
+
+		String sql = "SELECT * FROM contacts";
+		try (Connection conn = db.connect();
+				PreparedStatement stmt = conn.prepareStatement(sql);
+				ResultSet rs = stmt.executeQuery();) {
+			while (rs.next()) {
+				Contacts contact = new Contacts();
+				contact.setId(rs.getInt("id"));
+				contact.setName(rs.getString("name"));
+				contact.setTelefone(rs.getString("telefone"));
+				listContacts.add(contact);
+			}
+
+		} catch (SQLException e) {
+			System.out.println("Erro ao carregar os contatos no banco de dados: " + e.getMessage());
+		}
+		return listContacts;
+	}
+
 	public void addContact(String name, String telefone) {
+		if (contactExists(name)) {
+			System.out.println("ja existe um contato com esse nome!");
+			return;
+		}
 		Contacts contact = new Contacts(name, telefone);
-		contactList.add(contact);
-		saveContactToFile(contact);
-		System.out.println("Contato Adicionado!");
+		addContactToDatabase(contact);
+		listContacts.add(contact);
 	}
 
-	// Método que mostra todos os contatos
+	private void addContactToDatabase(Contacts contact) {
+		String sql = "INSERT INTO contacts (name, telefone) VALUES (?,?)";
+
+		try (Connection conn = db.connect()) {
+			PreparedStatement stmt = conn.prepareStatement(sql);
+
+			stmt.setString(1, contact.getName());
+			stmt.setString(2, contact.getTelefone());
+			stmt.executeUpdate();
+			System.out.println("Contato Salvo no banco de dados com sucesso.");
+		} catch (SQLException e) {
+			System.out.println("Erro ao salvar o contato no banco de dados: " + e.getMessage());
+		}
+	}
+
 	public void showContacts() {
-		if (contactList.isEmpty()) {
-			System.out.println("Nenhuma contato Cadastrado");
+		if (listContacts.isEmpty()) {
+			System.out.println("Nenhum Contato encotrado.");
 		} else {
 			System.out.println("\n=== Lista de Contatos ===");
-			for (Contacts c : contactList) {
+			for (Contacts c : listContacts) {
 				c.showContact();
 			}
 		}
 	}
 
-	// Método para salvar no arquivo
-	private void saveContactToFile(Contacts contact) {
-		try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME, true))) {
-			writer.write(contact.getName() + "," + contact.getTelefone());
-			writer.newLine();
-		} catch (IOException e) {
-			System.out.println("❌ Erro ao salvar o contato: " + e.getMessage());
+	public void removeContact(String name) {
+		String sql = "DELETE FROM contacts WHERE name = ?";
+		try (Connection conn = db.connect();) {
+			PreparedStatement stmt = conn.prepareStatement(sql);
+
+			stmt.setString(1, name);
+			int rowsAffected = stmt.executeUpdate();
+			if (rowsAffected > 0) {
+				System.out.println("Contato removido com sucesso!");
+			} else {
+				System.out.println("Nenhum contato encontrado com esse nome.");
+			}
+
+		} catch (SQLException e) {
+			System.out.println("Erro ao remover contato: " + e.getMessage());
 		}
 	}
 
-	// Método para carregar o dados do arquivo
-	private void loadContacts() {
-		File file = new File(FILE_NAME);
-		if (!file.exists())
-			return;
+	public boolean updateContact(int id, String newName, String newTelefone) {
+		String sql = "UPDATE contacts SET name = ?, telefone = ? WHERE id = ?";
+		try (Connection conn = db.connect()) {
+			PreparedStatement stmt = conn.prepareStatement(sql);
+			
+			stmt.setString(1, newName);
+			stmt.setString(2, newTelefone);
+			stmt.setInt(3, id);
+			
+			int rowsAffected = stmt.executeUpdate();
+			return rowsAffected > 0;
 
-		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-			String line;
-			while ((line = reader.readLine()) != null) {
-				String[] parts = line.split(",");
-				if (parts.length == 2) {
-					Contacts contact = new Contacts(parts[0], parts[1]);
-					contactList.add(contact);
+		} catch (SQLException e) {
+			System.out.println("Erro ao atualizar o contato: " + e.getMessage());
+			return false;
+		}
+	}
+
+	public void searchContact(String opcao) {
+		Scanner sc = new Scanner(System.in);
+		Utils u = new Utils();
+		Contacts foundContact = null;
+		switch (opcao) {
+		case "1": {
+			while (true) {
+				System.out.println("\nDigite o ID do contato: ");
+				String imput = sc.nextLine();
+				if (u.verificationNumber(imput)) {
+					int id = Integer.parseInt(imput);
+					foundContact = findContactById(id);
+					break;
+				} else {
+					System.out.println("\nApenas Números!, Aperte Enter para tentar de novo!");
+					sc.nextLine();
+					u.clear();
 				}
 			}
-		} catch (IOException e) {
-			System.out.println(" Erro ao carregar contatos: " + e.getMessage());
+			break;
+		}
+		case "2": {
+			System.out.println("\nDigite o nome do contato: ");
+			String name = sc.nextLine();
+			foundContact = findContactByName(name);
+			break;
+		}
+		default:
+			System.out.println("\nDigito Invalido!, tente novamente.");
+		}
+		if (foundContact != null) {
+			System.out.println("\nContato encontrado: ");
+			System.out.println("\nID: " + foundContact.getId());
+			System.out.println("Nome: " + foundContact.getName());
+			u.phoneFormat(foundContact.getTelefone());
+			System.out.println("\nAperte Enter para voltar ao menu");
+			sc.nextLine();
+			u.clear();
 		}
 	}
 
-	// Método para procurar o contato pelo nome e remover
-	public void removeContact(String name) {
-		boolean removed = false;
-		for (int i = 0; i < contactList.size(); i++) {
-			if (contactList.get(i).getName().equalsIgnoreCase(name)) {
-				contactList.remove(i);
-				removed = true;
-				System.out.println(" Contato removido com sucesso.");
-				break;
+	public Contacts findContactByName(String name) {
+		String sql = "SELECT * FROM contacts WHERE name = ?";
+		try (Connection conn = db.connect()) {
+			PreparedStatement stmt = conn.prepareStatement(sql);
+
+			stmt.setString(1, name);
+			ResultSet rs = stmt.executeQuery();
+			if (rs.next()) {
+				int id = rs.getInt("id");
+				String dbname = rs.getString("name");
+				String telefone = rs.getString("telefone");
+				return new Contacts(id,dbname, telefone);
+			} else {
+				System.out.println("Contato com nome: " + name + " não encontrado.");
 			}
+		} catch (SQLException e) {
+			System.out.println("Erro ao buscar contato por nome: " + e.getMessage());
 		}
-		if (removed) {
-			updateFile();
-		} else {
-			System.out.println("Contato não encontrado.");
-		}
+		return null;
 	}
 
-	// Método para subreescrever o arquivo, tanto para remover quanto editar os
-	// contatos
-	private void updateFile() {
-		try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME))) {
-			for (Contacts c : contactList) {
-				writer.write(c.getName() + "," + c.getTelefone());
-				writer.newLine();
+	public Contacts findContactById(int id) {
+		String sql = "SELECT * FROM contacts WHERE id = ?";
+		try (Connection conn = db.connect()) {
+			PreparedStatement stmt = conn.prepareStatement(sql);
+
+			stmt.setInt(1, id);
+			ResultSet rs = stmt.executeQuery();
+			if (rs.next()) {
+				int dbId = rs.getInt("id");
+				String name = rs.getString("name");
+				String telefone = rs.getString("telefone");
+				return new Contacts(dbId, name, telefone);
+			} else {
+				System.out.println("Contato com ID: " + id + " não encontrado.");
 			}
-		} catch (IOException e) {
-			System.out.println("❌ Erro ao atualizar o arquivo: " + e.getMessage());
+
+		} catch (SQLException e) {
+			System.out.println("Erro ao buscar contato por ID: " + e.getMessage());
 		}
+		return null;
 	}
 
-	// Método para procurar um contato pelo nome e mostra os dados
-	public void searchContact(String name) {
-		boolean found = false;
+	private boolean contactExists(String name) {
+		String sql = "SELECT COUNT(*) FROM contacts WHERE name = ?";
+		try (Connection conn = db.connect()) {
+			PreparedStatement stmt = conn.prepareStatement(sql);
 
-		for (Contacts c : contactList) {
-			if (c.getName().equalsIgnoreCase(name)) {
-				System.out.println("Contato Encontrado: ");
-				c.showContact();
-				found = true;
-				break;
-			}
-		}
-		if (!found) {
-			System.out.println("Contato não encontrado.");
-		}
-	}
+			stmt.setString(1, name);
+			ResultSet rs = stmt.executeQuery();
 
-	// Método para procurar um contato pelo nome e editar seus dados
-	public void editContact(String oldName, String newName, String newTelefone) {
-		boolean updating = false;
-		for (Contacts c : contactList) {
-			if (c.getName().equalsIgnoreCase(oldName)) {
-				c.setName(newName);
-				c.setTelefone(newTelefone);
-				updating = true;
-				System.out.println("Contato Atualizado com sucesso.");
-				break;
+			if (rs.next()) {
+				int count = rs.getInt(1);
+				return count > 0;
 			}
-		}
-		if (updating) {
-			updateFile();
-		} else {
-			System.out.println("Contato não encontrado para edição");
-		}
-	}
-	
-	// Método para verificar se o contato ja existe
-	public boolean contactExists(String name) {
-		for (Contacts c : contactList) {
-			if (c.getName().equalsIgnoreCase(name)) {
-				return true;
-			}
+
+		} catch (SQLException e) {
+			System.out.println("Erro verificar existência do contato: " + e.getMessage());
 		}
 		return false;
 	}
+
 }

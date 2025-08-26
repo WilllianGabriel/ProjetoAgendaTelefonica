@@ -11,8 +11,10 @@ public class Utils {
 
 	// verifica se o que foi digitado, é um número
 	public boolean verificationNumber(String text) {
-		if (!text.matches("\\d+")) {
-			System.out.println("\nDigite Apenas Números!");
+		if (text.matches("\\d+")) {
+			System.out.println("\nDigito Invalido!, tente novamente.");
+		}else {
+			System.out.println("Digite Apenas Números, tente novamente.");
 		}
 		return text.matches("\\d+");
 	}
@@ -24,6 +26,6 @@ public class Utils {
 					telefone.substring(3, 7),
 					telefone.substring(7, 11));
 		}
-		System.out.println("Telefone: " + telefone);
+		System.out.println(telefone);
 	}
 }

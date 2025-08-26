@@ -5,14 +5,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 
 public class ContactsManager {
 
 	private DatabaseConnection db = new DatabaseConnection();
-	private List<Contacts> listContacts = new ArrayList<Contacts>();
+	private List<Contacts> contactList = new ArrayList<Contacts>();
+	private Utils u = new Utils();
 
 	public ContactsManager() {
 		loadContact();
@@ -29,23 +29,19 @@ public class ContactsManager {
 				contact.setId(rs.getInt("id"));
 				contact.setName(rs.getString("name"));
 				contact.setTelefone(rs.getString("telefone"));
-				listContacts.add(contact);
+				contactList.add(contact);
 			}
 
 		} catch (SQLException e) {
 			System.out.println("Erro ao carregar os contatos no banco de dados: " + e.getMessage());
 		}
-		return listContacts;
+		return contactList;
 	}
 
 	public void addContact(String name, String telefone) {
-		if (contactExists(name)) {
-			System.out.println("ja existe um contato com esse nome!");
-			return;
-		}
 		Contacts contact = new Contacts(name, telefone);
 		addContactToDatabase(contact);
-		listContacts.add(contact);
+		contactList.add(contact);
 	}
 
 	private void addContactToDatabase(Contacts contact) {
@@ -64,24 +60,25 @@ public class ContactsManager {
 	}
 
 	public void showContacts() {
-		if (listContacts.isEmpty()) {
+		if (contactList.isEmpty()) {
 			System.out.println("Nenhum Contato encotrado.");
 		} else {
 			System.out.println("\n=== Lista de Contatos ===");
-			for (Contacts c : listContacts) {
+			for (Contacts c : contactList) {
 				c.showContact();
 			}
 		}
 	}
 
-	public void removeContact(String name) {
-		String sql = "DELETE FROM contacts WHERE name = ?";
+	public void removeContact(int id) {
+		String sql = "DELETE FROM contacts WHERE id = ?";
 		try (Connection conn = db.connect();) {
 			PreparedStatement stmt = conn.prepareStatement(sql);
 
-			stmt.setString(1, name);
+			stmt.setInt(1, id);
 			int rowsAffected = stmt.executeUpdate();
 			if (rowsAffected > 0) {
+				contactList.removeIf(Contacts -> Contacts.getId() == id);
 				System.out.println("Contato removido com sucesso!");
 			} else {
 				System.out.println("Nenhum contato encontrado com esse nome.");
@@ -92,18 +89,18 @@ public class ContactsManager {
 		}
 	}
 
-	public boolean updateContact(int id, String newName, String newTelefone) {
+	public void updateContact(int id, String newName, String newTelefone) {
 		String sql = "UPDATE contacts SET name = ?, telefone = ? WHERE id = ?";
 		try (Connection conn = db.connect()) {
 			PreparedStatement stmt = conn.prepareStatement(sql);
-			
+
 			stmt.setString(1, newName);
 			stmt.setString(2, newTelefone);
 			stmt.setInt(3, id);
-			
+
 			int rowsAffected = stmt.executeUpdate();
 			if (rowsAffected > 0) {
-				for (Contacts c : listContacts) {
+				for (Contacts c : contactList) {
 					if (c.getId() == id) {
 						c.setName(newName);
 						c.setTelefone(newTelefone);
@@ -111,62 +108,56 @@ public class ContactsManager {
 					}
 				}
 				System.out.println("Contato Atualizado com sucesso.");
-				return true;
 			} else {
 				System.out.println("Contato não encontrado.");
 			}
 		} catch (SQLException e) {
 			System.out.println("Erro ao atualizar o contato: " + e.getMessage());
 		}
-		return false;
 	}
 
-	public void searchContact(String opcao) {
-		Scanner sc = new Scanner(System.in);
-		Utils u = new Utils();
+	public void searchContact(int id) {
 		Contacts foundContact = null;
-		switch (opcao) {
-		case "1": {
-			while (true) {
-				System.out.println("\nDigite o ID do contato: ");
-				String imput = sc.nextLine();
-				if (u.verificationNumber(imput)) {
-					int id = Integer.parseInt(imput);
-					foundContact = findContactById(id);
-					break;
-				} else {
-					System.out.println("\nAperte Enter para tentar de novo!");
-					sc.nextLine();
-					u.clear();
-				}
-			}
-			break;
-		}
-		case "2": {
-			System.out.println("\nDigite o nome do contato: ");
-			String name = sc.nextLine();
-			foundContact = findContactByName(name);
-			break;
-		}
-		default:
-			if (opcao.matches("\\d+")) {
-				System.out.println("\nDigito Invalido!, tente novamente.");
-			} else {
-				System.out.println("Digite Apenas Números, tente novamente.");
-			}
-		}
+		foundContact = findContactById(id);;
 		if (foundContact != null) {
 			System.out.println("\nContato encontrado: ");
 			System.out.println("\nID: " + foundContact.getId());
 			System.out.println("Nome: " + foundContact.getName());
 			u.phoneFormat(foundContact.getTelefone());
-			System.out.println("\nAperte Enter para voltar ao menu");
-			sc.nextLine();
-			u.clear();
 		}
 	}
 
-	public Contacts findContactByName(String name) {
+	public Contacts findContact(String option) {
+		Scanner sc = new Scanner(System.in);
+		switch (option) {
+		case "1": {
+			while (true) {
+				System.out.println("\nDigite o ID do contato: ");
+				String input = sc.nextLine();
+				if (input.matches("\\d+")) {
+					int id = Integer.parseInt(input);
+					sc.nextLine();
+					return findContactById(id);
+				} else {
+					System.out.println("Digite Apenas Números, tente novamente.");
+					System.out.println("\nAperte Enter para tentar de novo!");
+					sc.nextLine();
+					u.clear();
+				}
+			}
+		}
+		case "2": {
+			System.out.println("\nDigite o nome do contato: ");
+			String name = sc.nextLine();
+			return findContactByName(name);
+		}
+		default:
+			u.verificationNumber(option);
+		}
+		return null;
+	}
+
+	private Contacts findContactByName(String name) {
 		String sql = "SELECT * FROM contacts WHERE name = ?";
 		try (Connection conn = db.connect()) {
 			PreparedStatement stmt = conn.prepareStatement(sql);
@@ -177,7 +168,7 @@ public class ContactsManager {
 				int id = rs.getInt("id");
 				String dbname = rs.getString("name");
 				String telefone = rs.getString("telefone");
-				return new Contacts(id,dbname, telefone);
+				return new Contacts(id, dbname, telefone);
 			} else {
 				System.out.println("Contato com nome: " + name + " não encontrado.");
 			}
@@ -187,7 +178,7 @@ public class ContactsManager {
 		return null;
 	}
 
-	public Contacts findContactById(int id) {
+	private Contacts findContactById(int id) {
 		String sql = "SELECT * FROM contacts WHERE id = ?";
 		try (Connection conn = db.connect()) {
 			PreparedStatement stmt = conn.prepareStatement(sql);
@@ -209,7 +200,7 @@ public class ContactsManager {
 		return null;
 	}
 
-	private boolean contactExists(String name) {
+	public boolean contactExists(String name) {
 		String sql = "SELECT COUNT(*) FROM contacts WHERE name = ?";
 		try (Connection conn = db.connect()) {
 			PreparedStatement stmt = conn.prepareStatement(sql);

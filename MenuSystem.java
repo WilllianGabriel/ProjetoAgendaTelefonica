@@ -1,7 +1,6 @@
 package agendatelefonica;
 
 import java.util.Scanner;
-
 import agendatelefonica.AuthSystem.LoginStatus;
 
 public class MenuSystem {
@@ -20,7 +19,6 @@ public class MenuSystem {
 
 	// Método para executar o menu de cadastro e login
 	private void showLoginMenu() {
-
 		while (true) {
 
 			// MENU DE CADASTRO
@@ -49,7 +47,7 @@ public class MenuSystem {
 				return;
 			}
 			default:
-				System.out.println("\nDigito Invalido!, Aperte Enter para tentar de novo!");
+				u.verificationNumber(n1);
 				sc.nextLine();
 				u.clear();
 				break;
@@ -143,7 +141,7 @@ public class MenuSystem {
 				return;
 			}
 			default:
-				System.out.println("\nDigito Invalido!, Aperte Enter para tentar de novo!");
+				u.verificationNumber(n2);
 				sc.nextLine();
 				u.clear();
 				break;
@@ -157,7 +155,7 @@ public class MenuSystem {
 
 		System.out.println("Digite o nome do Contato:");
 		String name = sc.nextLine();
-		if (name == null) {
+		if (manager.contactExists(name)) {
 			System.out.println("Já existe um contato com esse nome.");
 			System.out.println("\nAperte Enter para Voltar ao menu!");
 			sc.nextLine();
@@ -168,10 +166,11 @@ public class MenuSystem {
 		while (true) {
 			System.out.println("Digite o número do Contato:");
 			String telefone = sc.nextLine();
-			if (u.verificationNumber(telefone)) {
+			if (telefone.matches("\\d+")) {
 				manager.addContact(name, telefone);
 				break;
 			} else {
+				System.out.println("Digite Apenas Números");
 				System.out.println("\nAperte Enter para tentar de novo!");
 				sc.nextLine();
 				u.clear();
@@ -194,51 +193,35 @@ public class MenuSystem {
 	// Chama o método responsável por buscar um contato especifico e mostrar seus
 	// dados
 	private void searchContact() {
-		System.out.println("\nBuscar contato por:");
-		System.out.println("1 - ID");
-		System.out.println("2 - Nome");
-		System.out.print("\nEscolha uma opção: \n");
-		String opcao = sc.nextLine();
-		manager.searchContact(opcao);
-	}
-
-	// Chama o método responsável por editar os dados de um contato especifico
-	private void updateContact() {
 		Contacts foundContact = null;
 		System.out.println("\nBuscar contato por: \n");
 		System.out.println("1 - ID");
 		System.out.println("2 - Nome");
 		System.out.print("\nEscolha uma opção: \n");
 		String opcao = sc.nextLine();
+		foundContact = manager.findContact(opcao);
+		if (foundContact != null) {
+			manager.searchContact(foundContact.getId());
+			System.out.println("\nAperte Enter para voltar ao menu");
+			sc.nextLine();
+			u.clear();
+		} else {
+			System.out.println("\nAperte Enter para voltar ao menu");
+			sc.nextLine();
+			u.clear();
+		}
+	}
 
-		switch (opcao) {
-		case "1": {
-			while (true) {
-				System.out.println("\nDigite o ID do contato: ");
-				String imput = sc.nextLine();
-				if (u.verificationNumber(imput)) {
-					int id = Integer.parseInt(imput);
-					foundContact = manager.findContactById(id);
-					break;
-				} else {
-					System.out.println("\nApenas Números!, Aperte Enter para tentar de novo!");
-					sc.nextLine();
-					u.clear();
-				}
-			}
-			break;
-		}
-		case "2": {
-			System.out.println("\nDigite o nome do contato: ");
-			String name = sc.nextLine();
-			foundContact = manager.findContactByName(name);
-			break;
-		}
-		default:
-			System.out.println("\nDigito Invalido!, tente novamente.");
-			return;
-		}
-		System.out.println("Digite o novo nome para esse Contato: ");
+	// Chama o método responsável por editar os dados de um contato especifico
+	private void updateContact() {
+		System.out.println("\nBuscar contato por: \n");
+		System.out.println("1 - ID");
+		System.out.println("2 - Nome");
+		System.out.print("\nEscolha uma opção: \n");
+		String option = sc.nextLine();
+		Contacts foundContact = manager.findContact(option);
+		if (foundContact != null) {
+			System.out.println("Digite o novo nome para esse Contato: ");
 		String newName = sc.nextLine();
 		System.out.println("Digite o novo telefone para esse Contato: ");
 		String newTelefone = sc.nextLine();
@@ -246,15 +229,32 @@ public class MenuSystem {
 		System.out.println("\nAperte Enter para voltar ao menu");
 		sc.nextLine();
 		u.clear();
+		} else {
+			System.out.println("\nAperte Enter para voltar ao menu");
+			sc.nextLine();
+			u.clear();
+		}
+		
 	}
 
 	// Chama o método responsável por remover um contato especifico
 	private void removeContact() {
-		System.out.println("Digite o nome do contato que deseja remover: ");
-		String removeName = sc.nextLine();
-		// manager.removeContact(removeName);
-		System.out.println("\nAperte Enter para voltar ao menu");
-		sc.nextLine();
-		u.clear();
+		Contacts foundContact = null;
+		System.out.println("\nBuscar contato por: \n");
+		System.out.println("1 - ID");
+		System.out.println("2 - Nome");
+		System.out.print("\nEscolha uma opção: \n");
+		String opcao = sc.nextLine();
+		foundContact = manager.findContact(opcao);
+		if (foundContact != null) {
+			manager.removeContact(foundContact.getId());
+			System.out.println("\nAperte Enter para voltar ao menu");
+			sc.nextLine();
+			u.clear();
+		} else {
+			System.out.println("\nAperte Enter para voltar ao menu");
+			sc.nextLine();
+			u.clear();
+		}
 	}
 }

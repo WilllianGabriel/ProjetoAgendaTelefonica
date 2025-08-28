@@ -6,6 +6,7 @@ public class Contacts {
 	private int id;
 	Utils u = new Utils();
 	
+	// Método Construtor para registrar o id, nome e telefone do contato
 	public Contacts(int id, String name, String telefone) {
 		this.id = id;
 		this.name = name;

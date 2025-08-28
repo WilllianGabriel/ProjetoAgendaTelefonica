@@ -21,7 +21,6 @@ public class MenuSystem {
 	private void showLoginMenu() {
 		while (true) {
 
-			// MENU DE CADASTRO
 			System.out.println("\n === Cadastro / Login ===");
 			System.out.println("1 - Cadastrar");
 			System.out.println("2 - Login");
@@ -62,8 +61,15 @@ public class MenuSystem {
 		String email = sc.nextLine();
 		System.out.println("Digite seu senha:");
 		String password = sc.nextLine();
+		if (email == null || password == null) {
+			System.out.println("Email e Senha não podem ser vazios");
+			System.out.println("\nAperte Enter para voltar ao menu!");
+			sc.nextLine();
+			u.clear();
+			return;
+		}
 		auth.register(email, password);
-		System.out.println("Aperte Enter para continuar!");
+		System.out.println("\nAperte Enter para continuar!");
 		sc.nextLine();
 		u.clear();
 	}
@@ -149,13 +155,14 @@ public class MenuSystem {
 		}
 	}
 
-	// Chama o método responsável por adicionar novo contato na lista de contatos, e
-	// antes verifica se o cotato já existe
+	// Chama os metodos responsaveis por verificar se o cotato já existe, e adiciona
+	// esse novo contato
+	// na lista de contatos e no banco de dados
 	private static void promptAddContact(Scanner sc, ContactsManager manager, Utils u) {
 
 		System.out.println("Digite o nome do Contato:");
 		String name = sc.nextLine();
-		if (manager.contactExists(name)) {
+		if (manager.contactExistsByName(name)) {
 			System.out.println("Já existe um contato com esse nome.");
 			System.out.println("\nAperte Enter para Voltar ao menu!");
 			sc.nextLine();
@@ -166,6 +173,21 @@ public class MenuSystem {
 		while (true) {
 			System.out.println("Digite o número do Contato:");
 			String telefone = sc.nextLine();
+			if (manager.contactExistsByPhone(telefone)) {
+				System.out.println("Já existe um contato com esse nome.");
+				System.out.println("\nAperte Enter para Voltar ao menu!");
+				sc.nextLine();
+				u.clear();
+				return;
+			}
+			if (name == null || telefone == null) {
+				System.out.println("Nome e telefone não podem ser vazios");
+				System.out.println("\nAperte Enter para voltar ao menu!");
+				sc.nextLine();
+				u.clear();
+				return;
+			}
+
 			if (telefone.matches("\\d+")) {
 				manager.addContact(name, telefone);
 				break;
@@ -222,19 +244,19 @@ public class MenuSystem {
 		Contacts foundContact = manager.findContact(option);
 		if (foundContact != null) {
 			System.out.println("Digite o novo nome para esse Contato: ");
-		String newName = sc.nextLine();
-		System.out.println("Digite o novo telefone para esse Contato: ");
-		String newTelefone = sc.nextLine();
-		manager.updateContact(foundContact.getId(), newName, newTelefone);
-		System.out.println("\nAperte Enter para voltar ao menu");
-		sc.nextLine();
-		u.clear();
+			String newName = sc.nextLine();
+			System.out.println("Digite o novo telefone para esse Contato: ");
+			String newTelefone = sc.nextLine();
+			manager.updateContact(foundContact.getId(), newName, newTelefone);
+			System.out.println("\nAperte Enter para voltar ao menu");
+			sc.nextLine();
+			u.clear();
 		} else {
 			System.out.println("\nAperte Enter para voltar ao menu");
 			sc.nextLine();
 			u.clear();
 		}
-		
+
 	}
 
 	// Chama o método responsável por remover um contato especifico

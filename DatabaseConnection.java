@@ -10,6 +10,7 @@ public class DatabaseConnection {
 	private static final String USER = "root";
 	private static final String PASSWORD = "";
 	
+	// Método que conecta esse projeto java no banco de dados
 	public Connection connect() {
 		try {
 			return DriverManager.getConnection(URL, USER, PASSWORD);

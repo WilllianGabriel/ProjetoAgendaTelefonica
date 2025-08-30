@@ -10,14 +10,17 @@ public class Utils {
 	}
 
 	// verifica se o que foi digitado, é um número
-	public boolean verificationNumber(String text) {
-		if (text.matches("\\d+")) {
+	public void verificationNumber(String text) {
+		if (text == null){
+			System.out.println("Não pode ser vazio, tente novamente.");
+		}else if (text.matches("\\d+")) {
 			System.out.println("\nDigito Invalido!, tente novamente.");
-		}else {
+		}else{
 			System.out.println("Digite Apenas Números, tente novamente.");
 		}
-		return text.matches("\\d+");
 	}
+	
+	// Método que o número inserido fique na forma de número de telefone
 	public void phoneFormat(String telefone) {
 		if (telefone.length() == 11) {
 			telefone = String.format("(%s) %s %s-%s",
@@ -26,6 +29,6 @@ public class Utils {
 					telefone.substring(3, 7),
 					telefone.substring(7, 11));
 		}
-		System.out.println(telefone);
+		System.out.println("Telefone: " + telefone);
 	}
 }

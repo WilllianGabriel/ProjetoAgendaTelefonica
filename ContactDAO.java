@@ -4,13 +4,14 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ContactDAO {
 
 	private DatabaseConnection db = new DatabaseConnection();
-	private List<Contacts> contactList = new ArrayList<Contacts>();
+	public List<Contacts> contactList = new ArrayList<Contacts>();
 
 	// Carrega os contatos salvos no banco de dados
 	public List<Contacts> loadContact() {
@@ -26,7 +27,6 @@ public class ContactDAO {
 				contact.setTelefone(rs.getString("telefone"));
 				contactList.add(contact);
 			}
-
 		} catch (SQLException e) {
 			System.out.println("Erro ao carregar os contatos no banco de dados: " + e.getMessage());
 		}
@@ -34,24 +34,32 @@ public class ContactDAO {
 	}
 
 	// Método para adicionar um novo contato no banco de dados
-	public void addContactToDatabase(Contacts contact) {
+	public boolean addContactToDatabase(Contacts contact) {
 		String sql = "INSERT INTO contacts (name, telefone) VALUES (?,?)";
 
-		try (Connection conn = db.connect()) {
-			PreparedStatement stmt = conn.prepareStatement(sql);
-
+		try (Connection conn = db.connect();
+				PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);) {
 			stmt.setString(1, contact.getName());
 			stmt.setString(2, contact.getTelefone());
-			stmt.executeUpdate();
+			int rowsInserted = stmt.executeUpdate();
+			if (rowsInserted > 0) {
+				try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+					if (generatedKeys.next()) {
+						int generatedId = generatedKeys.getInt(1);
+						contact.setId(generatedId);
+						return true;
+					}
+				}
+			}
 			contactList.add(contact);
-			System.out.println("Contato Salvo no banco de dados com sucesso.");
 		} catch (SQLException e) {
 			System.out.println("Erro ao salvar o contato no banco de dados: " + e.getMessage());
 		}
+		return false;
 	}
 
-	// Método para remover o contato do banco de dados
-	public void removeDatabaseContact(int id) {
+	// Método que remove um contato do banco de dados
+	public boolean removeDatabaseContact(int id) {
 		String sql = "DELETE FROM contacts WHERE id = ?";
 		try (Connection conn = db.connect();) {
 			PreparedStatement stmt = conn.prepareStatement(sql);
@@ -59,19 +67,16 @@ public class ContactDAO {
 			stmt.setInt(1, id);
 			int rowsAffected = stmt.executeUpdate();
 			if (rowsAffected > 0) {
-				contactList.removeIf(Contacts -> Contacts.getId() == id);
-				System.out.println("Contato removido com sucesso!");
-			} else {
-				System.out.println("Nenhum contato encontrado com esse nome.");
+				return contactList.removeIf(Contacts -> Contacts.getId() == id);
 			}
-
 		} catch (SQLException e) {
 			System.out.println("Erro ao remover contato: " + e.getMessage());
 		}
+		return false;
 	}
 
 	// Método que atualiza os dados de um contato do banco de dados
-	public void updateContact(int id, String newName, String newTelefone) {
+	public boolean updateContact(int id, String newName, String newTelefone) {
 		String sql = "UPDATE contacts SET name = ?, telefone = ? WHERE id = ?";
 		try (Connection conn = db.connect()) {
 			PreparedStatement stmt = conn.prepareStatement(sql);
@@ -79,107 +84,69 @@ public class ContactDAO {
 			stmt.setString(1, newName);
 			stmt.setString(2, newTelefone);
 			stmt.setInt(3, id);
-
 			int rowsAffected = stmt.executeUpdate();
 			if (rowsAffected > 0) {
 				for (Contacts c : contactList) {
 					if (c.getId() == id) {
 						c.setName(newName);
 						c.setTelefone(newTelefone);
-						break;
+						return true;
 					}
 				}
-				System.out.println("Contato Atualizado com sucesso.");
-			} else {
-				System.out.println("Contato não encontrado.");
 			}
 		} catch (SQLException e) {
 			System.out.println("Erro ao atualizar nome/telefone do contato: " + e.getMessage());
 		}
-	}
-
-	// Método que encontra o contato no banco de dados pelo id
-	public Contacts findContactByName(String name) {
-		String sql = "SELECT * FROM contacts WHERE name = ?";
-		try (Connection conn = db.connect()) {
-			PreparedStatement stmt = conn.prepareStatement(sql);
-
-			stmt.setString(1, name);
-			ResultSet rs = stmt.executeQuery();
-			if (rs.next()) {
-				int id = rs.getInt("id");
-				String dbname = rs.getString("name");
-				String telefone = rs.getString("telefone");
-				return new Contacts(id, dbname, telefone);
-			} else {
-				System.out.println("Contato com nome: " + name + " não encontrado.");
-			}
-		} catch (SQLException e) {
-			System.out.println("Erro ao buscar contato por nome: " + e.getMessage());
-		}
-		return null;
-	}
-
-	// Método que encontra o contato no banco de dados pelo nome
-	public Contacts findContactById(int id) {
-		String sql = "SELECT * FROM contacts WHERE id = ?";
-		try (Connection conn = db.connect()) {
-			PreparedStatement stmt = conn.prepareStatement(sql);
-
-			stmt.setInt(1, id);
-			ResultSet rs = stmt.executeQuery();
-			if (rs.next()) {
-				int dbId = rs.getInt("id");
-				String name = rs.getString("name");
-				String telefone = rs.getString("telefone");
-				return new Contacts(dbId, name, telefone);
-			} else {
-				System.out.println("Contato com ID: " + id + " não encontrado.");
-			}
-
-		} catch (SQLException e) {
-			System.out.println("Erro ao buscar contato por ID: " + e.getMessage());
-		}
-		return null;
-	}
-
-	// Método que verifica se o contato existe no banco de dados
-	public boolean contactExistsByName(String name) {
-		String sql = "SELECT COUNT(*) FROM contacts WHERE name = ?";
-		try (Connection conn = db.connect()) {
-			PreparedStatement stmt = conn.prepareStatement(sql);
-
-			stmt.setString(1, name);
-			ResultSet rs = stmt.executeQuery();
-
-			if (rs.next()) {
-				int count = rs.getInt(1);
-				return count > 0;
-			}
-
-		} catch (SQLException e) {
-			System.out.println("Erro ao buscar contato pelo nome: " + e.getMessage());
-		}
 		return false;
 	}
-	
+
+	// Método que busca um contato pelo id ou nome especifico no banco de dados
+	public Contacts findContact(String field, String value) {
+		if (!field.equalsIgnoreCase("id") && !field.equalsIgnoreCase("name")) {
+			throw new IllegalArgumentException("Campo inválido: " + field);
+		}
+		String sql = "SELECT id, name, telefone FROM contacts WHERE " + field + " = ?";
+
+		try (Connection conn = db.connect(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+			if (field.equalsIgnoreCase("id")) {
+				stmt.setInt(1, Integer.parseInt(value));
+			} else {
+				stmt.setString(1, value);
+			}
+			ResultSet rs = stmt.executeQuery();
+
+			if (rs.next()) {
+				return new Contacts(rs.getInt("id"), rs.getString("name"), rs.getString("telefone"));
+			}
+		} catch (SQLException e) {
+			System.out.println("Erro ao buscar contato por " + field + ": " + e.getMessage());
+		}
+		return null; // se não encontrou
+	}
+
 	// Método que verifica se o contato existe no banco de dados
-	public boolean contactExistsByPhone(String telefone) {
-	    String sql = "SELECT COUNT(*) FROM contacts WHERE telefone = ?";
-	    try (Connection conn = db.connect();
-	         PreparedStatement stmt = conn.prepareStatement(sql)) {
+	public boolean contactExists(String field, String value) {
+		// Proteção contra SQL Injection: só permitimos "name" ou "phone"
+		if (!field.equalsIgnoreCase("name") && !field.equalsIgnoreCase("telefone") && !field.equalsIgnoreCase("id")) {
+			throw new IllegalArgumentException("Campo inválido: " + field);
+		}
 
-	        stmt.setString(1, telefone);
-	        ResultSet rs = stmt.executeQuery();
+		String sql = "SELECT COUNT(*) FROM contacts WHERE " + field + " = ?";
 
-	        if (rs.next()) {
-	            return rs.getInt(1) > 0;
-	        }
+		try (Connection conn = db.connect(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-	    } catch (SQLException e) {
-	        System.out.println("Erro ao buscar contato pelo telefone: " + e.getMessage());
-	    }
-	    return false;
+			// Substitui o "?" pelo valor (nome ou telefone)
+			stmt.setString(1, value);
+
+			ResultSet rs = stmt.executeQuery();
+			if (rs.next()) {
+				return rs.getInt(1) > 0; // retorna true se achou pelo menos 1
+			}
+
+		} catch (SQLException e) {
+			System.out.println("Erro ao verificar contato por " + field + ": " + e.getMessage());
+		}
+		return false;
 	}
 
 }

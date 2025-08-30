@@ -24,7 +24,7 @@ public class Contacts {
 	public void showContact() {
 		System.out.println("\nId: " + id);
 		System.out.println("Nome: " + name);
-		u.phoneFormat("Telefone: " + telefone);
+		u.phoneFormat(telefone);
 	}
 
 	// Método para retorna o valor do nome

@@ -7,7 +7,7 @@ public class AuthSystem {
 	//registra o email e senha do metodo construtor User
 	public void register(String email, String password) {
 		registeredUser = new User (email,password);
-		System.out.println("Cadastro Concluido com Sucesso!\n");
+		System.out.println("Cadastro Concluido com Sucesso!");
 	}
 	//Método para criar variaveis que agem como boolean
 	public enum LoginStatus{

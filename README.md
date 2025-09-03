@@ -1,5 +1,5 @@
 # ProjetoAgendaTelefonica
-Projeto criado para praticar o estudo de programação de Java em POO, operações básicas matemáticas e cadastro simples, salvar os dados em arquivo e futuramnete migrar para um banco de dados simples.
+Agenda de Contatos em Java, com sistema de login, cadastro e persistência em banco de dados MySQL.
 
-# Versão Main Atual
-Esta versão é para praticar banco de dados MySQl usando xampp, sendo uma versão mais evoluida e avançada da versão com texto.
+#Intuito
+Projeto com objetivo de praticar meus conhecimentos de programação em java e em POO, monstrando cada passo de evolução meu e do projeto.

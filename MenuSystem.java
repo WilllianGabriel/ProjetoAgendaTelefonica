@@ -219,7 +219,7 @@ public class MenuSystem {
 				sc.nextLine();
 				u.clear();
 			} else {
-				System.out.println("Contato não encontrado!");
+				System.out.println("contato não existente!");
 				System.out.println("\nAperte Enter para Voltar ao menu!");
 				sc.nextLine();
 				u.clear();
@@ -235,7 +235,7 @@ public class MenuSystem {
 				sc.nextLine();
 				u.clear();
 			} else {
-				System.out.println("Contato não encontrado!");
+				System.out.println("contato não existente!");
 				System.out.println("\nAperte Enter para Voltar ao menu!");
 				sc.nextLine();
 				u.clear();
@@ -263,7 +263,7 @@ public class MenuSystem {
 			if (manager.contactExists("id", id)) {
 				foundContact = manager.findContact("id", id);
 			}else {
-				System.out.println("Contato não encontrado!");
+				System.out.println("Contato não existente!");
 				System.out.println("\nAperte Enter para Voltar ao menu!");
 				sc.nextLine();
 				u.clear();
@@ -276,7 +276,7 @@ public class MenuSystem {
 			if (manager.contactExists("name", name)) {
 				foundContact = manager.findContact("name", name);
 			}else {
-				System.out.println("Contato não encontrado!");
+				System.out.println("Contato não existente!");
 				System.out.println("\nAperte Enter para Voltar ao menu!");
 				sc.nextLine();
 				u.clear();
@@ -290,9 +290,7 @@ public class MenuSystem {
 
 		if (foundContact != null) {
 			System.out.println("\nContato encontrado: \n");
-			System.out.println("ID: " + foundContact.getId());
-			System.out.println("Nome: " + foundContact.getName());
-			u.phoneFormat(foundContact.getTelefone());
+			System.out.println(foundContact);
 
 			while (true) {
 				System.out.println("\nDeseja Atualizar esse contato?\n");
@@ -320,7 +318,7 @@ public class MenuSystem {
 				}
 			}
 		} else {
-			System.out.println("Contato não encontrado!");
+			System.out.println("Contato não existente!");
 			System.out.println("\nAperte Enter para voltar ao menu");
 			sc.nextLine();
 			u.clear();
@@ -342,7 +340,7 @@ public class MenuSystem {
 			if (manager.contactExists("id", id)) {
 				foundContact = manager.findContact("id", id);
 			}else {
-				System.out.println("Contato não encontrado!");
+				System.out.println("Contato não existente!");
 				System.out.println("\nAperte Enter para Voltar ao menu!");
 				sc.nextLine();
 				u.clear();
@@ -355,7 +353,7 @@ public class MenuSystem {
 			if (manager.contactExists("name", name)) {
 				foundContact = manager.findContact("name", name);
 			}else {
-				System.out.println("Contato não encontrado!");
+				System.out.println("Contato não existente!");
 				System.out.println("\nAperte Enter para Voltar ao menu!");
 				sc.nextLine();
 				u.clear();
@@ -368,9 +366,7 @@ public class MenuSystem {
 		}
 		if (foundContact != null) {
 			System.out.println("\nContato encontrado: ");
-			System.out.println("\nID: " + foundContact.getId());
-			System.out.println("Nome: " + foundContact.getName());
-			u.phoneFormat(foundContact.getTelefone());
+			System.out.println(foundContact);
 
 			while (true) {
 				System.out.println("\nDeseja realmente remover esse contato?\n");

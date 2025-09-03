@@ -11,27 +11,6 @@ import java.util.List;
 public class ContactDAO {
 
 	private DatabaseConnection db = new DatabaseConnection();
-	public List<Contacts> contactList = new ArrayList<Contacts>();
-
-	// Carrega os contatos salvos no banco de dados
-	public List<Contacts> loadContact() {
-
-		String sql = "SELECT * FROM contacts";
-		try (Connection conn = db.connect();
-				PreparedStatement stmt = conn.prepareStatement(sql);
-				ResultSet rs = stmt.executeQuery();) {
-			while (rs.next()) {
-				Contacts contact = new Contacts();
-				contact.setId(rs.getInt("id"));
-				contact.setName(rs.getString("name"));
-				contact.setTelefone(rs.getString("telefone"));
-				contactList.add(contact);
-			}
-		} catch (SQLException e) {
-			System.out.println("Erro ao carregar os contatos no banco de dados: " + e.getMessage());
-		}
-		return contactList;
-	}
 
 	// Método para adicionar um novo contato no banco de dados
 	public boolean addContactToDatabase(Contacts contact) {
@@ -51,12 +30,32 @@ public class ContactDAO {
 					}
 				}
 			}
-			contactList.add(contact);
 		} catch (SQLException e) {
 			System.out.println("Erro ao salvar o contato no banco de dados: " + e.getMessage());
 		}
 		return false;
 	}
+	
+	// Carrega os contatos salvos no banco de dados temporariamente
+		public List<Contacts> getContacts() {
+			List<Contacts> list = new ArrayList<>();
+
+			String sql = "SELECT * FROM contacts";
+			try (Connection conn = db.connect();
+					PreparedStatement stmt = conn.prepareStatement(sql);
+					ResultSet rs = stmt.executeQuery();) {
+				while (rs.next()) {
+					Contacts contact = new Contacts(
+							rs.getInt("id"), 
+							rs.getString("name"), 
+							rs.getString("telefone"));
+					list.add(contact);
+				}
+			} catch (SQLException e) {
+				System.out.println("Erro ao carregar os contatos no banco de dados: " + e.getMessage());
+			}
+			return list;
+		}
 
 	// Método que remove um contato do banco de dados
 	public boolean removeDatabaseContact(int id) {
@@ -67,7 +66,7 @@ public class ContactDAO {
 			stmt.setInt(1, id);
 			int rowsAffected = stmt.executeUpdate();
 			if (rowsAffected > 0) {
-				return contactList.removeIf(Contacts -> Contacts.getId() == id);
+				return true;
 			}
 		} catch (SQLException e) {
 			System.out.println("Erro ao remover contato: " + e.getMessage());
@@ -86,13 +85,7 @@ public class ContactDAO {
 			stmt.setInt(3, id);
 			int rowsAffected = stmt.executeUpdate();
 			if (rowsAffected > 0) {
-				for (Contacts c : contactList) {
-					if (c.getId() == id) {
-						c.setName(newName);
-						c.setTelefone(newTelefone);
-						return true;
-					}
-				}
+				return true;
 			}
 		} catch (SQLException e) {
 			System.out.println("Erro ao atualizar nome/telefone do contato: " + e.getMessage());

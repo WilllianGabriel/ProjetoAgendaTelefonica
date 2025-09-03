@@ -1,15 +1,10 @@
 package agendatelefonica;
 
+import java.util.List;
+
 public class ContactsManager {
 
 	private ContactDAO contactDAO = new ContactDAO();
-	private Utils u = new Utils();
-
-	// Método Construtor que vai chamar o metodo que carregar os contatos no banco
-	// de dados
-	public ContactsManager() {
-		contactDAO.loadContact();
-	}
 
 	// Chama os metodos que salvam no banco de dados e na lista de contatos
 	public void addContact(String name, String telefone) {
@@ -50,12 +45,13 @@ public class ContactsManager {
 
 	// Método que mostra todos os contatos no banco de dados
 	public void showContacts() {
-		if (contactDAO.contactList.isEmpty()) {
+		List<Contacts> contacts = contactDAO.getContacts();
+		if (contacts.isEmpty()) {
 			System.out.println("Nenhum Contato encotrado.");
 		} else {
 			System.out.println("\n=== Lista de Contatos ===");
-			for (Contacts c : contactDAO.contactList) {
-				c.showContact();
+			for (Contacts c : contacts) {
+				System.out.println(c);
 			}
 		}
 	}
@@ -66,9 +62,7 @@ public class ContactsManager {
 		foundContact = contactDAO.findContact(field, value);
 		if (foundContact != null) {
 			System.out.println("\nContato encontrado: ");
-			System.out.println("\nID: " + foundContact.getId());
-			System.out.println("Nome: " + foundContact.getName());
-			u.phoneFormat(foundContact.getTelefone());
+			System.out.println(foundContact);
 		}
 	}
 

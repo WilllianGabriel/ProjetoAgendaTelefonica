@@ -4,7 +4,7 @@ public class Utils {
 	
 	// pular varias linhas e simula que limpou a tela
 	public void clear() {
-		for (int i = 0; i < 20; i++) {
+		for (int i = 0; i < 28; i++) {
 			System.out.println();
 		}
 	}
@@ -21,7 +21,7 @@ public class Utils {
 	}
 	
 	// Método que o número inserido fique na forma de número de telefone
-	public void phoneFormat(String telefone) {
+	public String phoneFormat(String telefone) {
 		if (telefone.length() == 11) {
 			telefone = String.format("(%s) %s %s-%s",
 					telefone.substring(0, 2),
@@ -29,6 +29,6 @@ public class Utils {
 					telefone.substring(3, 7),
 					telefone.substring(7, 11));
 		}
-		System.out.println("Telefone: " + telefone);
+		return "\nTelefone: " + telefone;
 	}
 }

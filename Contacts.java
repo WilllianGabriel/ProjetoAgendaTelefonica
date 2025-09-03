@@ -5,26 +5,18 @@ public class Contacts {
 	private String telefone;
 	private int id;
 	Utils u = new Utils();
-	
+
 	// Método Construtor para registrar o id, nome e telefone do contato
 	public Contacts(int id, String name, String telefone) {
 		this.id = id;
 		this.name = name;
 		this.telefone = telefone;
 	}
+
 	// Método Construtor para registrar o nome e telefone do contato
 	public Contacts(String name, String telefone) {
 		this.name = name;
 		this.telefone = telefone;
-	}
-	// Método Construtor vazio, para criar um novo objeto sem precisar inserir dados nele
-	public Contacts() {}
-
-	// Método para mostrar o nome e telefone
-	public void showContact() {
-		System.out.println("\nId: " + id);
-		System.out.println("Nome: " + name);
-		u.phoneFormat(telefone);
 	}
 
 	// Método para retorna o valor do nome
@@ -57,4 +49,8 @@ public class Contacts {
 		this.id = id;
 	}
 
+	// Método para mostrar o ID, Nome e Telefone
+	public String toString() {
+		return "\nID: " + id +"\nName: " + name + u.phoneFormat(telefone);
+	}
 }

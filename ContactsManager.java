@@ -5,11 +5,12 @@ import java.util.List;
 public class ContactsManager {
 
 	private ContactDAO contactDAO = new ContactDAO();
-
+	
 	// Chama os metodos que salvam no banco de dados e na lista de contatos
-	public void addContact(String name, String telefone) {
+	public void addContact(int id, String name, String telefone) {
 		Contacts contact = new Contacts(name, telefone);
-		if (contactDAO.addContactToDatabase(contact)) {
+		
+		if (contactDAO.addContactToDatabase(id, contact)) {
 			System.out.println("Contato Salvo com sucesso.");
 		}else {
 			System.out.println("Não foi possivel salvar o contato!");
@@ -44,8 +45,8 @@ public class ContactsManager {
 	}
 
 	// Método que mostra todos os contatos no banco de dados
-	public void showContacts() {
-		List<Contacts> contacts = contactDAO.getContacts();
+	public void showContacts(int id) {
+		List<Contacts> contacts = contactDAO.getContacts(id);
 		if (contacts.isEmpty()) {
 			System.out.println("Nenhum Contato encotrado.");
 		} else {

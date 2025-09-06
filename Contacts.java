@@ -1,10 +1,12 @@
 package agendatelefonica;
 
 public class Contacts {
+	
+	private int id;
 	private String name;
 	private String telefone;
-	private int id;
-	Utils u = new Utils();
+	
+	private final Utils u = new Utils();
 
 	// Método Construtor para registrar o id, nome e telefone do contato
 	public Contacts(int id, String name, String telefone) {
@@ -17,6 +19,16 @@ public class Contacts {
 	public Contacts(String name, String telefone) {
 		this.name = name;
 		this.telefone = telefone;
+	}
+
+	// Método para retorna o valor do id
+	public int getId() {
+		return id;
+	}
+
+	// Método para receber o valor do id
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	// Método para retorna o valor do nome
@@ -39,18 +51,8 @@ public class Contacts {
 		this.telefone = telefone;
 	}
 
-	// Método para retorna o valor do id
-	public int getId() {
-		return id;
-	}
-
-	// Método para receber o valor do id
-	public void setId(int id) {
-		this.id = id;
-	}
-
 	// Método para mostrar o ID, Nome e Telefone
 	public String toString() {
-		return "\nID: " + id +"\nName: " + name + u.phoneFormat(telefone);
+		return "\nID: " + id + "\nName: " + name + u.phoneFormat(telefone);
 	}
 }

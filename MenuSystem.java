@@ -1,26 +1,25 @@
 package agendatelefonica;
 
 import java.util.Scanner;
-import agendatelefonica.AuthSystem.LoginStatus;
 
 public class MenuSystem {
-
+	
 	private final Scanner sc = new Scanner(System.in);
-	private final AuthSystem auth = new AuthSystem();
-	private ContactsManager manager;
+	private UserManager userM = new UserManager();
+	private ContactsManager contactsM;
 	private User currentUser;
-	private Utils u = new Utils();
+	private final Utils u = new Utils();
 
-	// Método para chamar o metodo responsavel por executar o Menu de cadastro e
-	// login
+	// Chamar o metodo responsavel pelo Menu de cadastro e login
 	public void start() {
 		showLoginMenu();
 	}
 
-	// Método para executar o menu de cadastro e login
+	// Menu de cadastro e login
 	private void showLoginMenu() {
+		
 		while (true) {
-
+			
 			System.out.println("\n === Cadastro / Login ===");
 			System.out.println("1 - Cadastrar");
 			System.out.println("2 - Login");
@@ -36,7 +35,7 @@ public class MenuSystem {
 			case "2": {
 				currentUser = login();
 				if (currentUser != null) {
-					manager = new ContactsManager();
+					contactsM = new ContactsManager();
 					showMainMenu();
 				}
 				break;
@@ -48,7 +47,6 @@ public class MenuSystem {
 			default:
 				u.verificationNumber(n1);
 				sc.nextLine();
-				u.clear();
 				break;
 			}
 		}
@@ -57,18 +55,20 @@ public class MenuSystem {
 	// Método para casdastrar o email e senha do usuário
 	private void register() {
 		System.out.println("\n=== Cadastro ===");
-		System.out.println("Digite seu email:");
+		System.out.println("Digite seu Nome:");
+		String name = sc.nextLine();
+		System.out.println("Digite seu Email:");
 		String email = sc.nextLine();
-		System.out.println("Digite seu senha:");
+		System.out.println("Digite sua Senha:");
 		String password = sc.nextLine();
-		if (email == null || password == null) {
-			System.out.println("Email e Senha não podem ser vazios");
+		if (name == null || email == null || password == null) {
+			System.out.println("Nome, Email e Senha não podem ser vazios");
 			System.out.println("\nAperte Enter para voltar ao menu!");
 			sc.nextLine();
 			u.clear();
 			return;
 		}
-		auth.register(email, password);
+		userM.register(name, email, password);
 		System.out.println("\nAperte Enter para continuar!");
 		sc.nextLine();
 		u.clear();
@@ -83,35 +83,23 @@ public class MenuSystem {
 			String emailLogin = sc.nextLine();
 			System.out.println("Digite seu senha:");
 			String passwordLogin = sc.nextLine();
-			LoginStatus status = auth.login(emailLogin, passwordLogin);
-
-			switch (status) {
-			case LoginStatus.SUCESS: {
-				System.out.println("\nAperte Enter para continuar!");
-				sc.nextLine();
-				u.clear();
-				return new User(emailLogin, passwordLogin);
-			}
-			case LoginStatus.INVALID_PASSWORD: {
-				System.out.println("\nAperte Enter para tentar de novo!");
-				sc.nextLine();
-				u.clear();
-				break;
-			}
-			default:
-				System.out.println("\nAperte Enter para Voltar ao menu!");
-				sc.nextLine();
-				u.clear();
+			if (userM.login(emailLogin, passwordLogin) != null) {
+				System.out.println("Login efetuado com sucesso!");
+			} else {
+				System.out.println("\nSenha ou Email, não condiz com a nenhum cadastro.");
 				return null;
 			}
+			u.clear();
+			return userM.login(emailLogin, passwordLogin);
 		}
 	}
 
-	// Método para executar o Menu principal
+	// Menu principal
 	private void showMainMenu() {
 
 		while (true) {
-			System.out.println("\n=== Bem vindo, A Agenda de Contatos! ===\n");
+			u.clear();
+			System.out.println("\n=== Bem vindo(a), "+currentUser.getName()+", A Agenda de Contatos! ===\n");
 			System.out.println("1 - Adicionar um Contato");
 			System.out.println("2 - Lista de Contatos");
 			System.out.println("3 - Buscar contato");
@@ -123,23 +111,28 @@ public class MenuSystem {
 
 			switch (n2) {
 			case "1": {
-				promptAddContact(sc, manager, u);
+				promptAddContact();
+				u.clear();
 				break;
 			}
 			case "2": {
 				showContacts();
+				u.clear();
 				break;
 			}
 			case "3": {
 				searchContact();
+				u.clear();
 				break;
 			}
 			case "4": {
 				updateContact();
+				u.clear();
 				break;
 			}
 			case "5": {
 				removeContact();
+				u.clear();
 				break;
 			}
 			case "0": {
@@ -148,40 +141,37 @@ public class MenuSystem {
 			}
 			default:
 				u.verificationNumber(n2);
+				System.out.println("\nAperte Enter para Voltar ao menu!");
 				sc.nextLine();
 				u.clear();
 				break;
 			}
 		}
 	}
-
-	// Chama os metodos responsaveis por verificar se o cotato já existe, e adiciona
-	// esse novo contato na lista de contatos e no banco de dados
-	private static void promptAddContact(Scanner sc, ContactsManager manager, Utils u) {
+	
+	//Verifica se o contato existe, e depois chama o método para adicionar o contato no banco de dados
+	private void promptAddContact() {
 
 		System.out.println("Digite o nome do Contato:");
 		String name = sc.nextLine();
-		if (manager.contactExists("name", name)) {
+		if (contactsM.contactExists("name", name)) {
 			System.out.println("\nAperte Enter para Voltar ao menu!");
 			sc.nextLine();
-			u.clear();
 			return;
 		}
 
 		while (true) {
 			System.out.println("Digite o número do Contato:");
 			String telefone = sc.nextLine();
-			if (manager.contactExists("telefone", telefone)) {
+			if (contactsM.contactExists("telefone", telefone)) {
 				System.out.println("\nAperte Enter para Voltar ao menu!");
 				sc.nextLine();
-				u.clear();
 				return;
 			}
 			if (telefone.matches("\\d+")) {
-				manager.addContact(name, telefone);
+				contactsM.addContact(currentUser.getId(), name, telefone);
 				System.out.println("\nAperte Enter para Voltar ao menu!");
 				sc.nextLine();
-				u.clear();
 				break;
 			} else {
 				System.out.println("Digite Apenas Números");
@@ -195,10 +185,9 @@ public class MenuSystem {
 	// Chama o método responsável por mostrar os contatos ja
 	// adicionados
 	private void showContacts() {
-		manager.showContacts();
+		contactsM.showContacts(currentUser.getId());
 		System.out.println("\nAperte Enter para Voltar ao menu!");
 		sc.nextLine();
-		u.clear();
 	}
 
 	// Chama o método responsável por buscar um contato especifico e mostrar seus
@@ -213,37 +202,35 @@ public class MenuSystem {
 		case "1": {
 			System.out.println("Digite o ID do contato: ");
 			String id = sc.nextLine();
-			if (manager.contactExists("id", id)) {
-				manager.searchContact("id", id);
+			if (contactsM.contactExists("id", id)) {
+				contactsM.searchContact("id", id);
 				System.out.println("\nAperte Enter para Voltar ao menu!");
 				sc.nextLine();
-				u.clear();
 			} else {
 				System.out.println("contato não existente!");
 				System.out.println("\nAperte Enter para Voltar ao menu!");
 				sc.nextLine();
-				u.clear();
 			}
 			break;
 		}
 		case "2": {
 			System.out.println("Digite o Nome do contato: ");
 			String name = sc.nextLine();
-			if (manager.contactExists("name", name)) {
-				manager.searchContact("name", name);
+			if (contactsM.contactExists("name", name)) {
+				contactsM.searchContact("name", name);
 				System.out.println("\nAperte Enter para Voltar ao menu!");
 				sc.nextLine();
-				u.clear();
 			} else {
 				System.out.println("contato não existente!");
 				System.out.println("\nAperte Enter para Voltar ao menu!");
 				sc.nextLine();
-				u.clear();
 			}
 			break;
 		}
 		default: {
 			u.verificationNumber(option);
+			System.out.println("\nAperte Enter para Voltar ao menu!");
+			sc.nextLine();
 		}
 		}
 	}
@@ -260,8 +247,8 @@ public class MenuSystem {
 		case "1": {
 			System.out.println("Digite o ID do contato: ");
 			String id = sc.nextLine();
-			if (manager.contactExists("id", id)) {
-				foundContact = manager.findContact("id", id);
+			if (contactsM.contactExists("id", id)) {
+				foundContact = contactsM.findContact("id", id);
 			}else {
 				System.out.println("Contato não existente!");
 				System.out.println("\nAperte Enter para Voltar ao menu!");
@@ -273,8 +260,8 @@ public class MenuSystem {
 		case "2": {
 			System.out.println("DIgite o Nome do contato: ");
 			String name = sc.nextLine();
-			if (manager.contactExists("name", name)) {
-				foundContact = manager.findContact("name", name);
+			if (contactsM.contactExists("name", name)) {
+				foundContact = contactsM.findContact("name", name);
 			}else {
 				System.out.println("Contato não existente!");
 				System.out.println("\nAperte Enter para Voltar ao menu!");
@@ -285,6 +272,8 @@ public class MenuSystem {
 		}
 		default: {
 			u.verificationNumber(option);
+			System.out.println("\nAperte Enter para Voltar ao menu!");
+			sc.nextLine();
 		}
 		}
 
@@ -304,10 +293,9 @@ public class MenuSystem {
 					String newName = sc.nextLine();
 					System.out.println("Digite o novo telefone para esse Contato: ");
 					String newTelefone = sc.nextLine();
-					manager.updateContact(foundContact.getId(), newName, newTelefone);
+					contactsM.updateContact(foundContact.getId(), newName, newTelefone);
 					System.out.println("\nAperte Enter para voltar ao menu");
 					sc.nextLine();
-					u.clear();
 					return;
 				}
 				case "2": {
@@ -315,13 +303,14 @@ public class MenuSystem {
 				}
 				default:
 					u.verificationNumber(option);
+					System.out.println("\nAperte Enter para Voltar ao menu!");
+					sc.nextLine();
 				}
 			}
 		} else {
 			System.out.println("Contato não existente!");
 			System.out.println("\nAperte Enter para voltar ao menu");
 			sc.nextLine();
-			u.clear();
 		}
 	}
 
@@ -337,21 +326,20 @@ public class MenuSystem {
 		case "1": {
 			System.out.println("Digite o ID do contato: ");
 			String id = sc.nextLine();
-			if (manager.contactExists("id", id)) {
-				foundContact = manager.findContact("id", id);
+			if (contactsM.contactExists("id", id)) {
+				foundContact = contactsM.findContact("id", id);
 			}else {
 				System.out.println("Contato não existente!");
 				System.out.println("\nAperte Enter para Voltar ao menu!");
 				sc.nextLine();
-				u.clear();
 			}
 			break;
 		}
 		case "2": {
 			System.out.println("DIgite o Nome do contato: ");
 			String name = sc.nextLine();
-			if (manager.contactExists("name", name)) {
-				foundContact = manager.findContact("name", name);
+			if (contactsM.contactExists("name", name)) {
+				foundContact = contactsM.findContact("name", name);
 			}else {
 				System.out.println("Contato não existente!");
 				System.out.println("\nAperte Enter para Voltar ao menu!");
@@ -376,7 +364,7 @@ public class MenuSystem {
 				String option1 = sc.nextLine();
 				switch (option1) {
 				case "1": {
-					manager.removeContact(foundContact.getId());
+					contactsM.removeContact(foundContact.getId());
 					System.out.println("\nAperte Enter para voltar ao menu");
 					sc.nextLine();
 					u.clear();
@@ -390,9 +378,7 @@ public class MenuSystem {
 				}
 			}
 		} else {
-			System.out.println("\nAperte Enter para voltar ao menu");
-			sc.nextLine();
-			u.clear();
+			return;
 		}
 	}
 }

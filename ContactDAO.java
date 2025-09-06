@@ -11,15 +11,16 @@ import java.util.List;
 public class ContactDAO {
 
 	private DatabaseConnection db = new DatabaseConnection();
-
+	
 	// Método para adicionar um novo contato no banco de dados
-	public boolean addContactToDatabase(Contacts contact) {
-		String sql = "INSERT INTO contacts (name, telefone) VALUES (?,?)";
+	public boolean addContactToDatabase(int id, Contacts contact) {
+		String sql = "INSERT INTO contacts (user_id, name, telefone) VALUES (?,?,?)";
 
 		try (Connection conn = db.connect();
 				PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);) {
-			stmt.setString(1, contact.getName());
-			stmt.setString(2, contact.getTelefone());
+			stmt.setInt(1, id);
+			stmt.setString(2, contact.getName());
+			stmt.setString(3, contact.getTelefone());
 			int rowsInserted = stmt.executeUpdate();
 			if (rowsInserted > 0) {
 				try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
@@ -37,13 +38,14 @@ public class ContactDAO {
 	}
 	
 	// Carrega os contatos salvos no banco de dados temporariamente
-		public List<Contacts> getContacts() {
+		public List<Contacts> getContacts(int id) {
 			List<Contacts> list = new ArrayList<>();
 
-			String sql = "SELECT * FROM contacts";
+			String sql = "SELECT * FROM contacts WHERE user_id = ?";
 			try (Connection conn = db.connect();
-					PreparedStatement stmt = conn.prepareStatement(sql);
-					ResultSet rs = stmt.executeQuery();) {
+					PreparedStatement stmt = conn.prepareStatement(sql);) {
+				stmt.setInt(1, id);
+				ResultSet rs = stmt.executeQuery();
 				while (rs.next()) {
 					Contacts contact = new Contacts(
 							rs.getInt("id"), 

@@ -154,7 +154,8 @@ public class MenuSystem {
 
 		System.out.println("Digite o nome do Contato:");
 		String name = sc.nextLine();
-		if (contactsM.contactExists("name", name)) {
+		if (contactsM.contactExists("name", currentUser.getId(), name)) {
+			System.out.println("Já existe um contato com esse nome.");
 			System.out.println("\nAperte Enter para Voltar ao menu!");
 			sc.nextLine();
 			return;
@@ -162,14 +163,15 @@ public class MenuSystem {
 
 		while (true) {
 			System.out.println("Digite o número do Contato:");
-			String telefone = sc.nextLine();
-			if (contactsM.contactExists("telefone", telefone)) {
+			String phone = sc.nextLine();
+			if (contactsM.contactExists("phone", currentUser.getId(), phone)) {
+				System.out.println("Já existe um contato com esse telefone.");
 				System.out.println("\nAperte Enter para Voltar ao menu!");
 				sc.nextLine();
 				return;
 			}
-			if (telefone.matches("\\d+")) {
-				contactsM.addContact(currentUser.getId(), name, telefone);
+			if (phone.matches("\\d+")) {
+				contactsM.addContact(currentUser.getId(), name, phone);
 				System.out.println("\nAperte Enter para Voltar ao menu!");
 				sc.nextLine();
 				break;
@@ -202,8 +204,8 @@ public class MenuSystem {
 		case "1": {
 			System.out.println("Digite o ID do contato: ");
 			String id = sc.nextLine();
-			if (contactsM.contactExists("id", id)) {
-				contactsM.searchContact("id", id);
+			if (contactsM.contactExists("id", currentUser.getId(), id)) {
+				contactsM.searchContact("id", currentUser.getId(), id);
 				System.out.println("\nAperte Enter para Voltar ao menu!");
 				sc.nextLine();
 			} else {
@@ -216,8 +218,8 @@ public class MenuSystem {
 		case "2": {
 			System.out.println("Digite o Nome do contato: ");
 			String name = sc.nextLine();
-			if (contactsM.contactExists("name", name)) {
-				contactsM.searchContact("name", name);
+			if (contactsM.contactExists("name", currentUser.getId(), name)) {
+				contactsM.searchContact("name", currentUser.getId(), name);
 				System.out.println("\nAperte Enter para Voltar ao menu!");
 				sc.nextLine();
 			} else {
@@ -247,8 +249,8 @@ public class MenuSystem {
 		case "1": {
 			System.out.println("Digite o ID do contato: ");
 			String id = sc.nextLine();
-			if (contactsM.contactExists("id", id)) {
-				foundContact = contactsM.findContact("id", id);
+			if (contactsM.contactExists("id", currentUser.getId(), id)) {
+				foundContact = contactsM.findContact("id", currentUser.getId(), id);
 			}else {
 				System.out.println("Contato não existente!");
 				System.out.println("\nAperte Enter para Voltar ao menu!");
@@ -260,8 +262,8 @@ public class MenuSystem {
 		case "2": {
 			System.out.println("DIgite o Nome do contato: ");
 			String name = sc.nextLine();
-			if (contactsM.contactExists("name", name)) {
-				foundContact = contactsM.findContact("name", name);
+			if (contactsM.contactExists("name", currentUser.getId(), name)) {
+				foundContact = contactsM.findContact("name", currentUser.getId(), name);
 			}else {
 				System.out.println("Contato não existente!");
 				System.out.println("\nAperte Enter para Voltar ao menu!");
@@ -292,8 +294,8 @@ public class MenuSystem {
 					System.out.println("\nDigite o novo nome para esse Contato: ");
 					String newName = sc.nextLine();
 					System.out.println("Digite o novo telefone para esse Contato: ");
-					String newTelefone = sc.nextLine();
-					contactsM.updateContact(foundContact.getId(), newName, newTelefone);
+					String newPhone = sc.nextLine();
+					contactsM.updateContact(foundContact.getId(), currentUser.getId(), newName, newPhone);
 					System.out.println("\nAperte Enter para voltar ao menu");
 					sc.nextLine();
 					return;
@@ -326,8 +328,8 @@ public class MenuSystem {
 		case "1": {
 			System.out.println("Digite o ID do contato: ");
 			String id = sc.nextLine();
-			if (contactsM.contactExists("id", id)) {
-				foundContact = contactsM.findContact("id", id);
+			if (contactsM.contactExists("id", currentUser.getId(), id)) {
+				foundContact = contactsM.findContact("id", currentUser.getId(), id);
 			}else {
 				System.out.println("Contato não existente!");
 				System.out.println("\nAperte Enter para Voltar ao menu!");
@@ -338,8 +340,8 @@ public class MenuSystem {
 		case "2": {
 			System.out.println("DIgite o Nome do contato: ");
 			String name = sc.nextLine();
-			if (contactsM.contactExists("name", name)) {
-				foundContact = contactsM.findContact("name", name);
+			if (contactsM.contactExists("name", currentUser.getId(), name)) {
+				foundContact = contactsM.findContact("name", currentUser.getId(), name);
 			}else {
 				System.out.println("Contato não existente!");
 				System.out.println("\nAperte Enter para Voltar ao menu!");
@@ -364,7 +366,7 @@ public class MenuSystem {
 				String option1 = sc.nextLine();
 				switch (option1) {
 				case "1": {
-					contactsM.removeContact(foundContact.getId());
+					contactsM.removeContact(foundContact.getId(), currentUser.getId());
 					System.out.println("\nAperte Enter para voltar ao menu");
 					sc.nextLine();
 					u.clear();

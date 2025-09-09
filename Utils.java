@@ -21,14 +21,14 @@ public class Utils {
 	}
 	
 	// Método que o número inserido fique na forma de número de telefone
-	public String phoneFormat(String telefone) {
-		if (telefone.length() == 11) {
-			telefone = String.format("(%s) %s %s-%s",
-					telefone.substring(0, 2),
-					telefone.substring(2, 3),
-					telefone.substring(3, 7),
-					telefone.substring(7, 11));
+	public String phoneFormat(String phone) {
+		if (phone.length() == 11) {
+			phone = String.format("(%s) %s %s-%s",
+					phone.substring(0, 2),
+					phone.substring(2, 3),
+					phone.substring(3, 7),
+					phone.substring(7, 11));
 		}
-		return "\nTelefone: " + telefone;
+		return "\nTelefone: " + phone;
 	}
 }

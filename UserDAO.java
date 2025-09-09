@@ -21,7 +21,7 @@ public class UserDAO {
 			stmt.executeUpdate();
 			return true;
 		} catch (SQLException e) {
-			System.out.println("Erro ao tentar registrar usuário no banco de dados: " + e.getMessage());
+			System.out.println("Erro SQL ("+ sql +"): " + e.getMessage());
 			return false;
 		}
 	}
@@ -42,7 +42,7 @@ public class UserDAO {
 						rs.getString("password"));
 			}
 		} catch (SQLException e) {
-			System.out.println("Erro ao tentar logar no banco de dados: " + e.getMessage());
+			System.out.println("Erro SQL ("+ sql +"): " + e.getMessage());
 		}
 		return null;
 	}

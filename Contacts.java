@@ -4,21 +4,21 @@ public class Contacts {
 	
 	private int id;
 	private String name;
-	private String telefone;
+	private String phone;
 	
 	private final Utils u = new Utils();
 
 	// Método Construtor para registrar o id, nome e telefone do contato
-	public Contacts(int id, String name, String telefone) {
+	public Contacts(int id, String name, String phone) {
 		this.id = id;
 		this.name = name;
-		this.telefone = telefone;
+		this.phone = phone;
 	}
 
 	// Método Construtor para registrar o nome e telefone do contato
-	public Contacts(String name, String telefone) {
+	public Contacts(String name, String phone) {
 		this.name = name;
-		this.telefone = telefone;
+		this.phone = phone;
 	}
 
 	// Método para retorna o valor do id
@@ -42,17 +42,17 @@ public class Contacts {
 	}
 
 	// Método para retorna o valor do telefone
-	public String getTelefone() {
-		return telefone;
+	public String getPhone() {
+		return phone;
 	}
 
 	// Método para receber o valor do telefone
-	public void setTelefone(String telefone) {
-		this.telefone = telefone;
+	public void setPhone(String phone) {
+		this.phone = phone;
 	}
 
 	// Método para mostrar o ID, Nome e Telefone
 	public String toString() {
-		return "\nID: " + id + "\nName: " + name + u.phoneFormat(telefone);
+		return "\nID: " + id + "\nName: " + name + u.phoneFormat(phone);
 	}
 }
